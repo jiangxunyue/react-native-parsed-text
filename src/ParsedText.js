@@ -56,20 +56,24 @@ class ParsedText extends React.Component {
   }
 
   getParsedText() {
-    if (!this.props.parse)                       { return this.props.children; }
-    if (typeof this.props.children !== 'string') { return this.props.children; }
-
-    const textExtraction = new TextExtraction(this.props.children, this.getPatterns());
-
-    return textExtraction.parse().map((props, index) => {
-      return (
-        <ReactNative.Text
-          key={`parsedText-${index}`}
-          {...this.props.childrenProps}
-          {...props}
-        />
-      );
-    });
+    if (!this.props.parse || !this.props.children) {
+      return this.props.children;
+    }
+    return newChildren = React.Children.map(this.props.children, child => {
+      if (typeof child === 'string') {
+        const textExtraction = new TextExtraction(child, this.getPatterns());
+        return textExtraction.parse().map((props, index) => {
+          return (
+            <ReactNative.Text
+              key={`parsedText-${index}`}
+              {...this.props.childrenProps}
+              {...props}
+            />
+          );
+        });
+      }
+      return child;
+    })
   }
 
   render() {
